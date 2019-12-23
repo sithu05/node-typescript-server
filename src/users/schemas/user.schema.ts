@@ -19,6 +19,6 @@ UserSchema.plugin(PassportLocalMongoose, {
     limitAttempts: true,
     maxAttempts: 30,
     findByUsername: function(model, queryParameters) {
-        return model.findOne({ ...queryParameters, active: true });
+        return model.findOne({ ...queryParameters, active: true, provider: 'local' });
     }
 });
