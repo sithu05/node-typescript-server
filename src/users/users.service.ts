@@ -22,8 +22,6 @@ export class UsersService {
         });
 
         await user.setPassword(createUserDto.password);
-        await user.save();
-
-        return user;
+        return await user.save();
     }
 }
