@@ -10,8 +10,8 @@ export class AuthController {
     constructor(
         private readonly usersService: UsersService,
         private readonly authService: AuthService
-    ) {}
-    
+    ) { }
+
     @UseGuards(AuthGuard('jwt'))
     @Get('me')
     async getProfile(@Request() req) {
@@ -28,6 +28,6 @@ export class AuthController {
     async create(@Body() createUserDto: CreateUserDto) {
         const user = await this.usersService.createNewUser(createUserDto);
 
-        return user;
+        return this.authService.generateToken(user);
     }
 }

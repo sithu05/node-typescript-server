@@ -7,10 +7,14 @@ import { IUser } from './interfaces/user.interface';
 import { IProfile } from './interfaces/profile.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel('User') private readonly userModel: PassportLocalModel<IUser>) {}
+    constructor(
+        @InjectModel('User') private readonly userModel: PassportLocalModel<IUser>,
+        private readonly rolesService: RolesService
+    ) { }
 
     async findAllUsers(): Promise<IUser[]> {
         return this.userModel.find({}).lean().exec();
@@ -21,7 +25,7 @@ export class UsersService {
     }
 
     async createNewUser(createUserDto: CreateUserDto): Promise<IUser> {
-        // check existing user
+        // -------------------- check existing user --------------------
         const alreadyUser = await this.userModel.findOne({
             email: createUserDto.email,
             provider: createUserDto.provider
@@ -31,12 +35,16 @@ export class UsersService {
             throw new BadRequestException('This email already registered.');
         }
 
-        // -------------------- Ready to Register ----------------------
+        // -------------------- Ready to Register --------------------
+        const appUserRole = await this.rolesService.findOne({
+            name: 'Application Users'
+        });
 
         const user = new this.userModel({
             name: createUserDto.name,
             email: createUserDto.email,
             provider: createUserDto.provider,
+            role: createUserDto.role || appUserRole._id,
             active: true,
         });
 
