@@ -16,7 +16,23 @@ export class UsersService {
         return this.userModel.find({}).lean().exec();
     }
 
+    async findOne(query: any): Promise<IUser> {
+        return this.userModel.findOne(query).lean().exec();
+    }
+
     async createNewUser(createUserDto: CreateUserDto): Promise<IUser> {
+        // check existing user
+        const alreadyUser = await this.userModel.findOne({
+            email: createUserDto.email,
+            provider: createUserDto.provider
+        });
+
+        if (alreadyUser) {
+            throw new BadRequestException('This email already registered.');
+        }
+
+        // -------------------- Ready to Register ----------------------
+
         const user = new this.userModel({
             name: createUserDto.name,
             email: createUserDto.email,
