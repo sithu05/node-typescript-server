@@ -1,11 +1,12 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PassportLocalModel } from 'mongoose';
+import * as moment from 'moment';
 
 import { IUser } from './interfaces/user.interface';
+import { IProfile } from './interfaces/profile.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import e = require('express');
 
 @Injectable()
 export class UsersService {
@@ -46,8 +47,17 @@ export class UsersService {
             return user;
         } catch (err) {
             throw new BadRequestException(err.message);
-            console.log(err.message);
-            // throw new BadRequestException(err);
         }
+    }
+
+    async getProfile(_id: string): Promise<IProfile> {
+        const user: IUser = await this.userModel.findById(_id);
+
+        return {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            createdAt: moment(user.createdAt).fromNow()
+        };
     }
 }

@@ -5,4 +5,5 @@ export interface IUser extends PassportLocalDocument {
     email: string;
     provider: string;
     active: boolean;
+    createdAt: Date;
 }
